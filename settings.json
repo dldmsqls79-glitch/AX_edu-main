@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(npm ls *)",
+      "Bash(npm view *)",
+      "Bash(npm uninstall *)",
+      "Bash(npx --version)",
+      "Bash(npx next *)",
+      "Bash(npx playwright *)",
+      "Bash(npx kill-port *)",
+      "Bash(ls node_modules/.bin/next)",
+      "Bash(ls node_modules/framer-motion)",
+      "Bash(ls node_modules/lucide-react)",
+      "Bash(git add *)",
+      "Bash(git config *)",
+      "Bash(git remote *)",
+      "Bash(git push *)",
+      "Bash(gh repo *)",
+      "WebFetch(domain:wisebirds-ax-edu.vercel.app)",
+      "WebFetch(domain:help.airbridge.io)",
+      "WebFetch(domain:tenjin.com)",
+      "WebFetch(domain:splitmetrics.com)",
+      "WebFetch(domain:www.businessofapps.com)",
+      "WebFetch(domain:www.businesswire.com)",
+      "WebFetch(domain:stardive.netmarble.com)",
+      "PowerShell(npm run *)",
+      "PowerShell(npx next *)",
+      "PowerShell(npx playwright *)",
+      "Bash(git checkout *)",
+      "Bash(git commit *)",
+      "Bash(git merge *)",
+      "Bash(git branch *)",
+      "Bash(git mv *)",
+      "Bash(git ls-tree *)",
+      "Bash(rm -rf .next)",
+      "Bash(python -)",
+      "Bash(git commit -q -m '@ *)"
+    ]
+  }
+}
