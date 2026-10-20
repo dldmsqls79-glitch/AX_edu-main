@@ -1,0 +1,217 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css");
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+    system-ui, sans-serif;
+  --font-display: "Space Grotesk", "Pretendard Variable", sans-serif;
+  /* 이식한 개발 온보딩 장표가 쓰는 이름 (zqendix 원본과 동일한 디스플레이 폰트로 매핑) */
+  --font-space: "Space Grotesk", "Pretendard Variable", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* 상단 바 높이의 단일 출처 — TopBar(h-topbar)와 이 값에 붙는 좌표가 모두 참조한다.
+     이 값만 바꾸면 바·도트 네비·드로어가 함께 따라온다. */
+  --topbar-h: 56px;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* 문서 라우트의 바는 sticky 이므로 앵커 이동 시 대상이 바 뒤에 가리지 않게 한다 */
+  scroll-padding-top: var(--topbar-h);
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #f7f8fc;
+  color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
+  /* 한글은 음절 단위로 아무 데나 끊긴다("퍼포먼스 브랜/딩"). 어절에서만 끊는다.
+     대신 keep-all 은 공백 없는 긴 토큰을 못 끊으므로 break-word 를 짝으로 둔다.
+     (anywhere 로 올리면 min-content 가 바뀌어 그리드 칸이 좁아지고 한글이 다시 음절로 끊긴다) */
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  /* 덱·실습 페이지는 화면을 꽉 채우며 스크롤을 직접 소유한다 (Deck/LabShell에서 잠근다).
+     그 밖의 페이지(홈·교육 목록)는 문서 스크롤을 그대로 쓴다. */
+}
+
+/* deck scroll container: JS engine snaps one section at a time */
+#deck-scroll {
+  scrollbar-width: none;
+}
+#deck-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* gradient text helpers */
+.text-grad-violet {
+  background: linear-gradient(120deg, #a78bfa 0%, #7c3aed 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.text-grad-blue {
+  background: linear-gradient(120deg, #60a5fa 0%, #2563eb 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.text-grad-teal {
+  background: linear-gradient(120deg, #5eead4 0%, #0d9488 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ── 입체감 보조 유틸 ── */
+
+/* 미세 격자 — 히어로·섹션 배경에 깊이를 준다 */
+.bg-grid-fine {
+  background-image:
+    linear-gradient(to right, rgba(15, 23, 42, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.05) 1px, transparent 1px);
+  background-size: 34px 34px;
+}
+
+/* 위·아래로 자연스럽게 사라지는 마스크 (격자·캔버스에 씌운다) */
+.mask-fade-y {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 16%, #000 68%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 16%, #000 68%, transparent);
+}
+
+/* 카드 상단 1px 하이라이트 — 그림자만으로 부족할 때 겹쳐 쓴다 */
+.edge-top::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.95) 18%,
+    rgba(255, 255, 255, 0.95) 82%,
+    transparent
+  );
+}
+
+/* animated dotted connector for flow diagrams.
+   키프레임을 여기 직접 둔다 — tailwind.config 의 keyframes 에 두면
+   `animate-dash` 유틸리티를 쓰는 곳이 있어야만 @keyframes 가 출력되고,
+   손으로 쓴 이 클래스는 그 대상이 아니라 애니메이션이 조용히 죽는다. */
+@keyframes dash {
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+
+.flow-dash {
+  stroke-dasharray: 4 6;
+  animation: dash 0.9s linear infinite;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   인쇄 = PDF 저장. 상단 바의 PDF 버튼이 window.print() 를 부른다.
+
+   덱은 `fixed inset-0` 셸 + 스크롤 스냅이라 그대로 인쇄하면 한 장만 나온다.
+   여기서 셸을 풀고 **슬라이드 하나 = 페이지 하나**로 떨어뜨린다.
+   글자는 벡터로 남으므로 캔버스로 굽는 방식보다 결과가 낫다.
+   ══════════════════════════════════════════════════════════════════ */
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 8mm;
+  }
+
+  html,
+  body {
+    height: auto !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+
+  /* 배경색·그라디언트를 인쇄에 살린다 (기본은 흰 배경으로 떨어진다) */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* 셸 해제 */
+  [data-deck] {
+    position: static !important;
+    display: block !important;
+    height: auto !important;
+  }
+
+  [data-deck] #deck-scroll {
+    position: static !important;
+    height: auto !important;
+    flex: none !important;
+    overflow: visible !important;
+  }
+
+  /* 화면 전용 크롬 — 바 · 도트 네비 · 진행바 · SCROLL 버튼 */
+  [data-deck] > header,
+  [data-deck] nav[aria-label="슬라이드 네비게이션"],
+  [data-deck] .deck-chrome {
+    display: none !important;
+  }
+
+  /* 슬라이드 하나 = 페이지 하나.
+     A4 가로의 인쇄 폭은 1062px 로 화면(1400px 안팎)보다 좁다. 그대로 흘리면 내용이
+     세로로 늘어나 한 장이 두 페이지로 넘친다(1회차 3·13번이 실제로 그랬다).
+     → `zoom` 으로 **설계 폭에 배치한 뒤 종이에 맞춰 축소**한다.
+       transform 은 레이아웃을 바꾸지 않아 페이지가 안 나뉘므로 zoom 이어야 한다.
+     두 값은 짝이다 — 배율을 고치면 min-height 도 같이 고친다 (125 = 100 / 0.8). */
+  [data-deck] #deck-scroll > section {
+    zoom: 0.8;
+    min-height: 125vh;
+    height: auto !important;
+    border: 0 !important;
+    break-after: page;
+    page-break-after: always;
+  }
+
+  [data-deck] #deck-scroll > section:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+
+  /* framer-motion 의 whileInView 는 화면 밖 슬라이드를 opacity:0 · translate 로 둔다.
+     인쇄에는 뷰포트 진입이 없으므로 전부 펴 준다 — 이게 없이는 표지 말고 전부 빈 페이지로 나온다.
+     인라인 스타일을 이겨야 해서 !important 가 필요하다. */
+  [data-deck] #deck-scroll * {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* 위 규칙의 부작용 차단 — 8~13% 로 깔아둔 장식 블롭까지 불투명해져
+     표지·마무리에 진한 색 띠가 생긴다. 장식이므로 인쇄에서는 통째로 뺀다.
+     (opacity 규칙을 좁히는 방향은 안 된다 — framer 가 임의 요소에 인라인으로 걸기 때문) */
+  [data-deck] .deck-decor {
+    display: none !important;
+  }
+}
+
+/* ── 한글 조판 : 줄의 균형 ──
+   keep-all 로 어절에서만 끊게 해도, 마지막 줄에 두 글자만 남는 고아 줄은 그대로 생긴다.
+   제목은 balance(줄 길이를 고르게), 본문은 pretty(고아 줄 방지)로 잡는다.
+   지원하지 않는 브라우저는 조용히 무시하므로 안전하다 — 줄 수는 바뀌지 않아 인쇄 높이에도 영향이 없다. */
+.ko-head {
+  text-wrap: balance;
+}
+.ko-body {
+  text-wrap: pretty;
+}
